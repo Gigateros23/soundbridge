@@ -13,7 +13,7 @@ dependencies = ["dasbus"]
 bluetooth-audio-connector = "bluetooth_audio_connector:main"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/bluetooth-audio-connector"
+Homepage = "https://github.com/Gigateros23/soundbridge"
 
 [tool.setuptools.packages.find]
 include = ["bluetooth_audio_connector*"]

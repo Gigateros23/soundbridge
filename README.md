@@ -35,7 +35,7 @@ Your PC becomes a Bluetooth speaker. Pair your phone once, click to connect, and
 ### Arch Linux / CachyOS / Manjaro
 
 ```bash
-git clone https://github.com/yourusername/soundbridge.git
+git clone https://github.com/Gigateros23/soundbridge.git
 cd soundbridge
 bash setup.sh
 ```
@@ -47,7 +47,7 @@ sudo apt install -y python3-gi python3-gi-cairo \
     gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1 \
     python3-dasbus bluez pulseaudio-module-bluetooth
 
-git clone https://github.com/yourusername/soundbridge.git
+git clone https://github.com/Gigateros23/soundbridge.git
 cd soundbridge
 bash setup.sh
 ```
@@ -58,7 +58,7 @@ bash setup.sh
 sudo dnf install -y python3-gobject python3-dasbus \
     libayatana-appindicator-gtk3 bluez
 
-git clone https://github.com/yourusername/soundbridge.git
+git clone https://github.com/Gigateros23/soundbridge.git
 cd soundbridge
 bash setup.sh
 ```
