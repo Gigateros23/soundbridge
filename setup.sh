@@ -1,42 +1,122 @@
 #!/usr/bin/env bash
 set -e
 
-echo "==> Installing system dependencies..."
-sudo pacman -S --needed --noconfirm \
-    python-gobject \
-    python-dasbus \
-    libayatana-appindicator \
-    bluez \
-    bluez-utils
+detect_distro() {
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        echo "$ID"
+    else
+        echo "unknown"
+    fi
+}
 
-echo "==> Enabling Bluetooth service..."
-sudo systemctl enable --now bluetooth
+install_deps_arch() {
+    sudo pacman -S --needed --noconfirm \
+        python-gobject \
+        python-dasbus \
+        libayatana-appindicator \
+        bluez \
+        bluez-utils
+}
 
-echo "==> Installing WirePlumber A2DP Sink config..."
-mkdir -p "$HOME/.config/wireplumber/wireplumber.conf.d"
-cp wireplumber/51-bluez-a2dp-sink.conf \
-    "$HOME/.config/wireplumber/wireplumber.conf.d/51-bluez-a2dp-sink.conf"
+install_deps_ubuntu() {
+    sudo apt-get update -qq
+    sudo apt-get install -y \
+        python3-gi \
+        python3-gi-cairo \
+        gir1.2-gtk-3.0 \
+        gir1.2-ayatanaappindicator3-0.1 \
+        python3-dasbus \
+        bluez \
+        pulseaudio-module-bluetooth 2>/dev/null || true
+}
 
-echo "==> Restarting WirePlumber..."
-systemctl --user restart wireplumber
+install_deps_fedora() {
+    sudo dnf install -y \
+        python3-gobject \
+        python3-dasbus \
+        libayatana-appindicator-gtk3 \
+        bluez
+}
 
-echo "==> Installing the app in a virtual environment..."
-python3 -m venv --system-site-packages .venv
-.venv/bin/pip install -e . --quiet
+setup_wireplumber() {
+    echo "==> Configuring WirePlumber (A2DP Sink)..."
+    mkdir -p "$HOME/.config/wireplumber/wireplumber.conf.d"
+    cp wireplumber/51-bluez-a2dp-sink.conf \
+        "$HOME/.config/wireplumber/wireplumber.conf.d/51-bluez-a2dp-sink.conf"
+    systemctl --user restart wireplumber
+}
 
-LAUNCHER="$HOME/.local/bin/bluetooth-audio-connector"
-mkdir -p "$HOME/.local/bin"
-cat > "$LAUNCHER" <<EOF
+setup_pulseaudio() {
+    echo "==> Configuring PulseAudio (A2DP Sink)..."
+    mkdir -p "$HOME/.config/pulse"
+    PACONF="$HOME/.config/pulse/default.pa"
+    if ! grep -q "module-bluetooth-discover" "$PACONF" 2>/dev/null; then
+        echo ".include /etc/pulse/default.pa" >> "$PACONF"
+        echo "load-module module-bluetooth-discover" >> "$PACONF"
+    fi
+    pulseaudio -k && pulseaudio --start || true
+}
+
+setup_audio() {
+    if systemctl --user is-active --quiet wireplumber 2>/dev/null; then
+        setup_wireplumber
+    elif systemctl --user is-active --quiet pipewire 2>/dev/null; then
+        setup_wireplumber
+    else
+        setup_pulseaudio
+    fi
+}
+
+install_app() {
+    echo "==> Installing the app..."
+    python3 -m venv --system-site-packages .venv
+    .venv/bin/pip install -e . --quiet
+
+    LAUNCHER="$HOME/.local/bin/soundbridge"
+    mkdir -p "$HOME/.local/bin"
+    cat > "$LAUNCHER" <<EOF
 #!/usr/bin/env bash
 exec "$(pwd)/.venv/bin/bluetooth-audio-connector" "\$@"
 EOF
-chmod +x "$LAUNCHER"
-echo "Launcher installed at $LAUNCHER"
+    chmod +x "$LAUNCHER"
+    echo "Launcher installed: $LAUNCHER"
+}
+
+DISTRO=$(detect_distro)
+echo "==> Detected distro: $DISTRO"
+
+echo "==> Installing system dependencies..."
+case "$DISTRO" in
+    arch|cachyos|manjaro|endeavouros|garuda)
+        install_deps_arch
+        ;;
+    ubuntu|debian|linuxmint|pop)
+        install_deps_ubuntu
+        ;;
+    fedora|rhel|centos|rocky|alma)
+        install_deps_fedora
+        ;;
+    *)
+        echo "Unsupported distro: $DISTRO"
+        echo "Install manually: python3-gobject, python3-dasbus, libayatana-appindicator, bluez"
+        exit 1
+        ;;
+esac
+
+echo "==> Enabling Bluetooth..."
+sudo systemctl enable --now bluetooth
+
+setup_audio
+install_app
 
 echo ""
-echo "Done! Run with: bluetooth-audio-connector"
+echo "Done! Run: soundbridge"
 echo ""
-echo "To pair your phone:"
-echo "  1. Run: bluetoothctl"
-echo "  2. Commands: power on → discoverable on → pairable on → scan on"
-echo "  3. Pair your phone, then on your phone connect to this PC via Bluetooth audio"
+echo "First time? Pair your phone:"
+echo "  bluetoothctl"
+echo "  > power on"
+echo "  > discoverable on"
+echo "  > pairable on"
+echo "  > scan on"
+echo "  Then pair from your phone's Bluetooth settings."

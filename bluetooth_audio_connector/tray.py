@@ -1,8 +1,15 @@
 import subprocess
 import gi
 gi.require_version("Gtk", "3.0")
-gi.require_version("AyatanaAppIndicator3", "0.1")
-from gi.repository import Gtk, AyatanaAppIndicator3
+
+try:
+    gi.require_version("AyatanaAppIndicator3", "0.1")
+    from gi.repository import AyatanaAppIndicator3 as AppIndicator
+except (ValueError, ImportError):
+    gi.require_version("AppIndicator3", "0.1")
+    from gi.repository import AppIndicator3 as AppIndicator
+
+from gi.repository import Gtk
 
 ICON_DEFAULT = "bluetooth"
 ICON_CONNECTED = "bluetooth-active"
@@ -15,13 +22,13 @@ class TrayIcon:
         self._on_open_settings = on_open_settings
         self._on_exit = on_exit
 
-        self._indicator = AyatanaAppIndicator3.Indicator.new(
-            "bluetooth-audio-connector",
+        self._indicator = AppIndicator.Indicator.new(
+            "soundbridge",
             ICON_DEFAULT,
-            AyatanaAppIndicator3.IndicatorCategory.HARDWARE,
+            AppIndicator.IndicatorCategory.HARDWARE,
         )
-        self._indicator.set_status(AyatanaAppIndicator3.IndicatorStatus.ACTIVE)
-        self._indicator.set_title("Bluetooth Audio Connector")
+        self._indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+        self._indicator.set_title("soundbridge")
 
         self._menu = Gtk.Menu()
         self._indicator.set_menu(self._menu)
@@ -42,9 +49,9 @@ class TrayIcon:
                     item.connect("activate", lambda _w, d=device: self._on_connect(d.path))
                 self._menu.append(item)
         else:
-            no_device = Gtk.MenuItem(label="No audio devices paired")
-            no_device.set_sensitive(False)
-            self._menu.append(no_device)
+            placeholder = Gtk.MenuItem(label="No audio devices paired")
+            placeholder.set_sensitive(False)
+            self._menu.append(placeholder)
 
         self._menu.append(Gtk.SeparatorMenuItem())
 
@@ -61,5 +68,5 @@ class TrayIcon:
         any_connected = any(d.connected for d in audio_devices)
         self._indicator.set_icon_full(
             ICON_CONNECTED if any_connected else ICON_DEFAULT,
-            "Bluetooth Audio Connector",
+            "soundbridge",
         )
