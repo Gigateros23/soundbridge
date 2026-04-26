@@ -15,6 +15,7 @@ install_deps_arch() {
         python-gobject \
         python-dasbus \
         libayatana-appindicator \
+        libnotify \
         bluez \
         bluez-utils
 }
@@ -26,6 +27,7 @@ install_deps_ubuntu() {
         python3-gi-cairo \
         gir1.2-gtk-3.0 \
         gir1.2-ayatanaappindicator3-0.1 \
+        gir1.2-notify-0.7 \
         python3-dasbus \
         bluez \
         pulseaudio-module-bluetooth 2>/dev/null || true
@@ -36,6 +38,7 @@ install_deps_fedora() {
         python3-gobject \
         python3-dasbus \
         libayatana-appindicator-gtk3 \
+        libnotify \
         bluez
 }
 
