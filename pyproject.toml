@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bluetooth-audio-connector"
+version = "0.1.0"
+description = "Stream audio from your phone to your Linux PC over Bluetooth (A2DP Sink)"
+requires-python = ">=3.10"
+dependencies = ["dasbus"]
+
+[project.scripts]
+bluetooth-audio-connector = "bluetooth_audio_connector:main"
+
+[project.urls]
+Homepage = "https://github.com/yourusername/bluetooth-audio-connector"
+
+[tool.setuptools.packages.find]
+include = ["bluetooth_audio_connector*"]
+
+[tool.setuptools.package-data]
+bluetooth_audio_connector = ["icons/*"]

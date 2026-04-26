@@ -1,0 +1,13 @@
+pyproject.toml
+bluetooth_audio_connector/__init__.py
+bluetooth_audio_connector/__main__.py
+bluetooth_audio_connector/app.py
+bluetooth_audio_connector/bluetooth.py
+bluetooth_audio_connector/settings.py
+bluetooth_audio_connector/tray.py
+bluetooth_audio_connector.egg-info/PKG-INFO
+bluetooth_audio_connector.egg-info/SOURCES.txt
+bluetooth_audio_connector.egg-info/dependency_links.txt
+bluetooth_audio_connector.egg-info/entry_points.txt
+bluetooth_audio_connector.egg-info/requires.txt
+bluetooth_audio_connector.egg-info/top_level.txt

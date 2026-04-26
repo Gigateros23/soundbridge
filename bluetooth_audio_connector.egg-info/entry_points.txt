@@ -1,0 +1,2 @@
+[console_scripts]
+bluetooth-audio-connector = bluetooth_audio_connector:main

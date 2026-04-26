@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: bluetooth-audio-connector
+Version: 0.1.0
+Summary: Stream audio from your phone to your Linux PC over Bluetooth (A2DP Sink)
+Project-URL: Homepage, https://github.com/yourusername/bluetooth-audio-connector
+Requires-Python: >=3.10
+Requires-Dist: dasbus
