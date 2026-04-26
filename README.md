@@ -142,6 +142,31 @@ On Ubuntu 22.04 with PulseAudio, the setup script installs a PulseAudio Bluetoot
 
 ---
 
+## Uninstall
+
+Run the uninstall script from the project folder:
+
+```bash
+bash uninstall.sh
+```
+
+This removes:
+- The `soundbridge` launcher from `~/.local/bin/`
+- The virtual environment (`.venv/`)
+- Saved settings (`~/.config/bluetooth-audio-connector/`)
+- The WirePlumber A2DP Sink config and restarts WirePlumber
+- The PulseAudio Bluetooth config *(Ubuntu 22.04 only)*
+
+The source folder itself is not deleted. To remove it completely:
+
+```bash
+bash uninstall.sh && cd .. && rm -rf soundbridge
+```
+
+The system Bluetooth stack (BlueZ) and audio server (PipeWire/PulseAudio) are not touched.
+
+---
+
 ## Contributing
 
 Pull requests are welcome. If you have a bug or feature request, open an issue.
